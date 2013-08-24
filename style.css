@@ -1,0 +1,64 @@
+#the_screen {
+    height: auto;
+    overflow: hidden;
+    position: absolute;
+    z-index: -2;
+	left: 200px;
+    position: absolute;
+    top: 50px;
+}
+
+ul li {
+	list-style: hiragana outside none;
+}
+
+#testbuttons {
+	left: 700px;
+    position: absolute;
+    top: 100px;
+    z-index: 10;
+}
+body {
+    background-color: lightblue;
+    overflow: hidden;
+}
+
+#content_wrapper {
+    display: table;
+    margin-left: auto;
+    margin-right: auto;
+    min-height: 1000px;
+    min-width: 420px;
+    position: relative;
+}
+
+#trans_dedicated {
+    min-height: inherit;
+    min-width: inherit;
+    position: absolute;
+}
+#content  {
+	text-align: center;
+    min-height: inherit;
+    min-width: inherit;
+    position: absolute;
+}
+
+
+.transparent {
+  background-color: white;
+	  /* IE 8 */
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+
+  /* IE 5-7 */
+  filter: alpha(opacity=50);
+
+  /* Netscape */
+  -moz-opacity: 0.5;
+
+  /* Safari 1.x */
+  -khtml-opacity: 0.5;
+
+  /* Good browsers */
+  opacity: 0.5;
+}

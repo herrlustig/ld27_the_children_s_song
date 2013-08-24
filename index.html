@@ -1,0 +1,120 @@
+<html>
+<head>
+	<title> TODO: Game Name , Ludum Dare #27 Game Jam @Oerlikon, Switzerland</title>
+	<meta name="description" content="Experimental dynamic sound library using flash" /> 
+	<meta name="keywords" content="javascript sound, javascript audio, flash synthesis, Beat Kunz, javascript to flash communication" />
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
+
+	<script type="text/javascript" src="script/dynsoundmanager.js"></script>
+	<script type="text/javascript" src="script/envelopejs.js"></script>
+
+	 <!-- jquery -->
+	 <script src="script/jquery-1.9.1.min.js"></script>
+ 
+	<script src="script/processing-1.4.1.js"></script> <!-- -->
+	<link type="text/css" href="style.css" rel="Stylesheet">
+</head>
+<body>
+	<h1 style="text-align: center;">TODO: Gamename</h1>
+	<div id="content_wrapper">
+	</div>
+	
+	<div id='flashcontainer' >
+		<object type="application/x-shockwave-flash" data="swf/dynsoundmanager_debug.swf" id="dynsoundmanager" style="margin:0 10px;width:auto;height:auto;">
+
+			<param name="movie" value="swf/dynsoundmanager_debug.swf" />
+			<param name="wmode" value="transparent" /> 
+
+			<param name="FlashVars" value="" />
+
+			<param name="quality" value="high" />
+			<param name="haspriority" value="true" />
+
+			<param name="menu" value="false" />
+
+		</object>
+	</div>
+	
+	<div id="the_screen">
+		<!--  -->
+		<canvas id="mecanvas" data-processing-sources='script/thegame.pde script/codebase_2.pde script/preloads.pde'></canvas> <!-- -->
+		<!--
+		<canvas id="mecanvas" data-processing-sources='script/sketch17.pde script/codebase_2.pde script/preloads.pde'></canvas> -->
+	</div>
+	
+	<script type="text/javascript">
+		dynsoundManager = new DynSoundManager();
+
+		window.DynSoundManager = DynSoundManager; // constructor
+		window.dynsoundManager = dynsoundManager; // public API, flash callbacks etc.
+		
+		// load some instruments
+		dynsoundManager._onFlashLoadCallback = function() {
+				dynsoundManager.load("harp", "12", "audio/harp-c2.mp3");
+				// dynsoundManager.load("harp", "24", "audio/harp-c3.mp3");
+				dynsoundManager.load("harp", "36", "audio/harp-c4.mp3");
+				// dynsoundManager.load("harp", "48", "audio/harp-c5.mp3");
+				dynsoundManager.load("harp", "60", "audio/harp-c6.mp3");
+				// dynsoundManager.load("harp", "72", "audio/harp-c7.mp3");
+				dynsoundManager.load("female", "48", "audio/chorus-female-c5.mp3");
+				// dynsoundManager.load("female", "60", "audio/chorus-female-c6.mp3");
+				dynsoundManager.load("male", "24", "audio/chorus-male-c3.mp3");
+				// dynsoundManager.load("male", "36", "audio/chorus-male-c4.mp3");
+				dynsoundManager.load("piano", "12", "audio/piano-f-c1.mp3");
+				// dynsoundManager.load("piano", "24", "audio/piano-f-c3.mp3");
+				dynsoundManager.load("piano", "36", "audio/piano-f-c4.mp3");
+				// dynsoundManager.load("piano", "48", "audio/piano-f-c5.mp3");
+				dynsoundManager.load("piano", "60", "audio/piano-f-c6.mp3");
+				// dynsoundManager.load("piano", "72", "audio/piano-f-c7.mp3");
+				dynsoundManager.load("piano", "84", "audio/piano-f-c8.mp3");
+
+				/*
+				playInterval();
+				playInterval();
+				*/
+		};
+
+		var init_pentatone = 12;
+		var tempo_harp = 1000;
+		var octave_range = 2;
+		var instrument_set = ["male", "female","harp"];
+		function playInterval() {
+			self.setInterval( function () {
+				// pentatonic array
+				var instr = instrument_set[Math.floor(Math.random()* (instrument_set.length+1))];
+				var pentatones = [0,2,4,7,9];
+				var the_chosen = pentatones[Math.floor(Math.random() * (pentatones.length + 1))];
+				var octave = Math.floor(Math.random()*octave_range)*12;
+				dynsoundManager.play(instr, ""+(the_chosen + octave + init_pentatone)); 
+			}, tempo_harp );
+		}
+		function stopAllIntervals () {
+			// Set a fake timeout to get the highest timeout id
+			var highestTimeoutId = setTimeout(";");
+			for (var i = 0 ; i < highestTimeoutId ; i++) {
+				clearTimeout(i); 
+			}
+			
+			// also stop following tone
+			dynsoundManager.stopNamedNote("test")
+		}
+		
+		$().ready(function () {
+			console.log("document ready");
+			/*
+			$(window).mousemove(function(e){
+			  var pageCoords = "( " + e.pageX + ", " + e.pageY + " )";
+			  var clientCoords = "( " + e.clientX + ", " + e.clientY + " )";
+			  // dynsoundManager.setNamedNoteSetting("test", "midiNr",""+((e.clientX/600) + (e.clientY/200) + 20)); 
+
+			});
+			*/ // TODO: remove
+			// MIDI.Player.setDynSoundManager(dynsoundManager); // TODO: check later if needed, else remove
+		})
+	</script>
+	<div id='testbuttons'>
+	<button onclick="javascript:void(stopAllIntervals())">Stop Everything</button>
+	<button onclick="javascript:void(playInterval())">Play the 'random' tones</button>
+	</div>
+</body>
+</html>
