@@ -47,6 +47,7 @@
 
 		window.DynSoundManager = DynSoundManager; // constructor
 		window.dynsoundManager = dynsoundManager; // public API, flash callbacks etc.
+		creatures_volume = 0.8;
 		
 		// load some instruments
 		dynsoundManager._onFlashLoadCallback = function() {
@@ -59,14 +60,11 @@
 				dynsoundManager.load("female", "48", "audio/chorus-female-c5.mp3");
 				// dynsoundManager.load("female", "60", "audio/chorus-female-c6.mp3");
 				dynsoundManager.load("male", "24", "audio/chorus-male-c3.mp3");
-				// dynsoundManager.load("male", "36", "audio/chorus-male-c4.mp3");
-				dynsoundManager.load("piano", "12", "audio/piano-f-c1.mp3");
-				// dynsoundManager.load("piano", "24", "audio/piano-f-c3.mp3");
-				dynsoundManager.load("piano", "36", "audio/piano-f-c4.mp3");
-				// dynsoundManager.load("piano", "48", "audio/piano-f-c5.mp3");
-				dynsoundManager.load("piano", "60", "audio/piano-f-c6.mp3");
-				// dynsoundManager.load("piano", "72", "audio/piano-f-c7.mp3");
-				dynsoundManager.load("piano", "84", "audio/piano-f-c8.mp3");
+				// fadeout setting
+				dynsoundManager.setInstrumentSetting("harp","fade_out_time", "250") // in ms, only effects notes with a duration shorter then the sample used
+				dynsoundManager.setInstrumentSetting("female","fade_out_time", "250") // in ms, only effects notes with a duration shorter then the sample used
+				dynsoundManager.setInstrumentSetting("male","fade_out_time", "250") // in ms, only effects notes with a duration shorter then the sample used
+				dynsoundManager.setInstrumentSetting("piano","fade_out_time", "250") // in ms, only effects notes with a duration shorter then the sample used
 
 				/*
 				playInterval();

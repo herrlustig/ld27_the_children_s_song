@@ -7,7 +7,18 @@ float DAMPENING = 0.75;
 
 int lvl_width = 1000;
 int lvl_height = 1000;
-boolean challengeMode = false; 
+
+// challenge stuff
+boolean challengeMode = false;
+boolean activChallenge = false; // will be set by hero, if started he can not move until challenge is over
+boolean endedSinging = false;
+LevelText ltxt_instruction;
+float challengeStart = 0; // in milliseconds
+float challengeStartHeroSing = 0; // in milliseconds
+int lastSecond = -1; 
+boolean challenge_success = false;
+Koopa challenger;
+song_length = 4; // TODO: this makes the hardness of the game :D
 
 void initialize() {
   addScreen("level", new HeroLevel(lvl_width, lvl_height));  
@@ -54,22 +65,14 @@ class HeroLayer extends LevelLayer {
 	hero.setPosition(10, 200);
     addPlayer(hero);
 	Koopa koopa1 = new Koopa(64, height-64);
-	Koopa koopa2 =  new Koopa(100, height-64);
-	Koopa koopa3 =  new Koopa(120, height-64);
-	Koopa koopa4 =  new Koopa(140, height-64);
-	Koopa koopa5 =  new Koopa(160, height-64);
-	Koopa koopa6 =  new Koopa(170, height-64);
-	Koopa koopa7 =  new Koopa(180, height-64);
-	Koopa koopa8 =  new Koopa(190, height-64);
+	Koopa koopa2 =  new Koopa(300, height-64);
+	Koopa koopa3 =  new Koopa(780, height-64);
+	Koopa koopa4 =  new Koopa(840, height-64);
 	Koopa koopa9 =  new Koopa(200, 200);
 	addInteractor(koopa1);
 	addInteractor(koopa2);
 	addInteractor(koopa3);
 	addInteractor(koopa4);
-	addInteractor(koopa5);
-	addInteractor(koopa6);
-	addInteractor(koopa7);
-	addInteractor(koopa8);
 	addInteractor(koopa9);
 	
 	/*
@@ -91,10 +94,14 @@ class HeroLayer extends LevelLayer {
 	
 	// add decorative foreground bushes
     addBushes();
-	LevelText ltxt1 = new LevelText("Just a teeeeest", 20, height-64, "fonts/acmesa.ttf", 10);
+	LevelText ltxt1 = new LevelText("", 20, height-64, "fonts/acmesa.ttf", 20);
 	ltxt1.attach_to(hero);
-	hero.changeText("changed text");
+	// hero.changeText("changed text");
 	addText(ltxt1);
+	
+	ltxt_instruction = new LevelText("", 0, 0, "fonts/acmesa.ttf", 30);
+	addText(ltxt_instruction);
+
 	
 
   }
@@ -170,6 +177,15 @@ class Hero extends Player {
   float speed = 2;
   ArrayList<Positionable> followers; // following creatures
   float followDistance = 15;
+  ArrayList<int> played_notes;
+  int hero_note_length = 500;
+  boolean note_0_playing = false;
+  boolean note_2_playing = false;
+  boolean note_4_playing = false;
+  boolean note_7_playing = false;
+  boolean note_9_playing = false;
+  boolean note_12_playing = false;
+
 
 
   Hero(float x, float y) {
@@ -180,9 +196,19 @@ class Hero extends Player {
     handleKey('A');
     handleKey('D');
     handleKey('S');
+    handleKey('C');
+    handleKey('F');
+	handleKey('G');
+    handleKey('H');
+    handleKey('J');
+    handleKey('K');
+    handleKey('L');
+
+
 
     setImpulseCoefficients(DAMPENING,DAMPENING);
 	this.followers = new ArrayList<Positionable>();
+	played_notes = new ArrayList<int>();
 	println( "Hero initialized ");
 
   }
@@ -257,33 +283,86 @@ class Hero extends Player {
     setCurrentState("idle");
   }
   void handleInput() {
-    if(isKeyDown('A') || isKeyDown('D')) {
-      if (isKeyDown('A')) {
-        // when we walk left, we need to flip the sprite
-        setHorizontalFlip(true);
-        // walking left means we get a negative impulse along the x-axis:
-        addImpulse(-speed, 0);
-        // and we set the viewing direction to "left"
-        setViewDirection(-1, 0);
-      }
-      if (isKeyDown('D')) {
-        // when we walk right, we need to NOT flip the sprite =)
-        setHorizontalFlip(false);
-        // walking right means we get a positive impulse along the x-axis:
-        addImpulse(speed, 0);
-        // and we set the viewing direction to "right"
-        setViewDirection(1, 0);
-      }
-    }
-    if (isKeyDown('W')) { 
-		addImpulse(0,-2); 
-		dynsoundManager.play("harp", "40"); //+(the_chosen + octave + init_pentatone));
-		setViewDirection(0, -1);
+  
+	// only let him move when no active challenge
+	if (activChallenge != true) {
+		if(isKeyDown('A') || isKeyDown('D')) {
+		  if (isKeyDown('A')) {
+			// when we walk left, we need to flip the sprite
+			setHorizontalFlip(true);
+			// walking left means we get a negative impulse along the x-axis:
+			addImpulse(-speed, 0);
+			// and we set the viewing direction to "left"
+			setViewDirection(-1, 0);
+		  }
+		  if (isKeyDown('D')) {
+			// when we walk right, we need to NOT flip the sprite =)
+			setHorizontalFlip(false);
+			// walking right means we get a positive impulse along the x-axis:
+			addImpulse(speed, 0);
+			// and we set the viewing direction to "right"
+			setViewDirection(1, 0);
+		  }
+
+		}
+		if (isKeyDown('W')) { 
+			addImpulse(0,-2); 
+			setViewDirection(0, -1);
+		}
+		if (isKeyDown('S')) { 
+			addImpulse(0,2); 
+			setViewDirection(0, 1);
+		}
+		
+		if(isKeyDown('C') && challengeMode && challenger) {
+			// start the challenge timer
+			challengeStart = millis();
+			activChallenge = true;
+			ltxt_instruction.setText('You accepted\nthe challenge');
+			
+		}
 	}
-	if (isKeyDown('S')) { 
-		addImpulse(0,2); 
-		dynsoundManager.play("harp", "40"); //+(the_chosen + octave + init_pentatone));
-		setViewDirection(0, 1);
+	if(isKeyDown('F')) {
+		if(note_0_playing == false) {
+			note_0_playing = true;
+			playNote(0);
+			setTimeout(function () { note_0_playing = false} ,hero_note_length/2);
+		}
+	}
+	if(isKeyDown('G')) {
+		if(note_2_playing == false) {
+			note_2_playing = true;
+			playNote(2);
+			setTimeout(function () { note_2_playing = false} ,hero_note_length/2);
+		}
+	}
+	if(isKeyDown('H')) {
+		if(note_4_playing == false) {
+			note_4_playing = true;
+			playNote(4);
+			setTimeout(function () { note_4_playing = false} ,hero_note_length/2);
+		}
+	}
+	if(isKeyDown('J')) {
+		if(note_7_playing == false) {
+			note_7_playing = true;
+			playNote(7);
+			setTimeout(function () { note_7_playing = false} ,hero_note_length/2);
+		}
+	}
+	if(isKeyDown('K')) {
+		if(note_9_playing == false) {
+			note_9_playing = true;
+			playNote(9);
+			setTimeout(function () { note_9_playing = false} ,hero_note_length/2);
+		}
+	}
+	if(isKeyDown('L')) {
+		if(note_12_playing == false) {
+			note_12_playing = true;
+			playNote(12);
+			setTimeout(function () { note_12_playing = false} ,hero_note_length/2);
+		}
 	}
 	// and what do we look like when we do this?
     if (active.mayChange())
@@ -301,6 +380,41 @@ class Hero extends Player {
       }
     }
   }
+  
+  // plays notes and adds them to the played notes during challenge
+  void playNote(int noteNr) {
+	println("hero played note " + noteNr);
+	if(activChallenge && endedSinging) {
+		played_notes.add(noteNr);
+		// if more notes in played_notes then challengers melody, remove the first
+		if (played_notes.size() > challenger.notes.size()) {
+			played_notes.remove(0);
+			println("remove note because its longer then melody, first is now" + played_notes.get(0));
+		}
+		
+		if (played_notes.size() == challenger.notes.size()) {
+			println("melody played has same size! check it now")
+			is_success = true;
+			for ( int i = 0; i < challenger.notes.size(); i++;) {
+				if (played_notes.get(i) != challenger.notes.get(i)) {
+					println("NOT ok note " + played_notes.get(i) + "  , should be " + challenger.notes.get(i) )
+					is_success = false;
+					break;
+				} else {
+					println("ok note " + played_notes.get(i))
+				}
+			
+			}
+			if (is_success) {
+				challenge_success = true;
+				println("SUCCESS!!!");
+
+			}
+		}
+		
+	}
+	dynsoundManager.play("harp",""+(init_pentatone+noteNr),1,hero_note_length);
+  }
 }
 Hero hero;
 
@@ -315,6 +429,18 @@ class Koopa extends Interactor {
   boolean beaten = false; // if the hero successfully challenged the animal, this turns true
 
   Envelope rotateEnv;
+  
+  boolean isSinging = false; 
+  
+  ArrayList<int> notes;
+  ArrayList<int> notes_length; // in milliseconds
+  
+  float singing_timer = 0;
+  int current_note = 0;
+  int current_song_length = 0; // in milliseconds
+  int pause_between_notes = 300;
+  int pause_at_end = 1500;
+
 
   Koopa(float x, float y) {
     super("Koopa Trooper");
@@ -325,6 +451,95 @@ class Koopa extends Interactor {
 	rotateEnv = new Envelope([0,0],[1],"repeat",0,"custom","Math.sin(y/15.75)*(Math.PI*2/30)");
 	rotateEnv.start();
 	
+	// melody stuff
+	
+	notes = new ArrayList<int>();
+	notes_length = new ArrayList<int>();
+	
+	generateNewSong(song_length); 
+	
+  }
+  
+  
+  // melody_length, nr of notes
+  void generateNewSong(int melody_length) {
+	// stop current singing
+	isSinging = false;
+	// clear the old melody
+	notes.clear();
+	notes_length.clear();
+	int total_length = 0; // millisec, keep track of how long the song goes
+	int max_song_length = 4000; // a maximum of 4 seconds
+	ArrayList<int> possible_notes = new ArrayList<int>(); // TODO: influence by environment tonality
+	possible_notes.add(0);
+	possible_notes.add(2); 
+	possible_notes.add(4); 
+	possible_notes.add(7); 
+	possible_notes.add(9);
+	possible_notes.add(12);
+	ArrayList<int> possible_lengths = new ArrayList<int>(); // TODO: could be influenced by environment rhythm
+	possible_lengths.add(250); 
+	possible_lengths.add(500); 
+	for(int i = 0; total_length <= max_song_length && notes.size() < melody_length; i++) {
+		// pick a note
+		int new_note = possible_notes.get(floor(Math.random()*(possible_notes.size()-1)));
+		// pick its length
+		int new_length = possible_lengths.get(floor(Math.random()*(possible_lengths.size()-1)));
+		if ( total_length + new_length <= max_song_length) {
+			notes.add(new_note);
+			notes_length.add(new_length);
+			total_length = total_length + new_length;
+		} else {
+			break
+		}
+	}
+	this.current_song_length = total_length + ((this.notes.size()-1)*pause_between_notes)  + pause_at_end;
+	println("New song generated with total length of " + this.current_song_length + " With #" +notes.size() + " notes");
+  }
+  
+  void sing() {
+	// only start singing if not currently singing
+	if (this.isSinging == false) {
+		this.isSinging = true;
+		String s = "";
+		for(int i = 0; i < this.notes.size(); i++) {
+			s = s + this.notes.get(i) + " ";
+		}
+		println("start singing this: " + s);
+		int delay_singing = 500; // 500 ms delay till singing
+		int at_time = delay_singing; 
+		float note_volume = creatures_volume; // TODO: change, let the distance to hero decide
+		for (int i = 0; i < this.notes.size(); i++) {
+			var current_note = this.notes.get(i);
+			var current_length = this.notes_length.get(i);
+			// println("plan to sing singing note " + (24+current_note) + " length: " + current_length);
+			scheduleNote(current_note, current_length, at_time, note_volume);
+
+			
+			at_time = at_time + current_length + (i*pause_between_notes);
+		}
+		// also set timeout function to stop singing
+		thisanimal = this;
+		setTimeout(function () { 
+			thisanimal.isSinging = false; 
+			println("stop singing");
+		},this.current_song_length+delay_singing)
+		
+	}
+  
+  }
+  
+  void scheduleNote(int note_nr, int note_length_in_ms, time_to_play, float note_volume) {
+	var volume_ = note_volume;
+	var current_note_ = note_nr;
+	var current_length_ = note_length_in_ms;
+	var at_time_ = time_to_play;
+	setTimeout( function () {
+				// TODO: only play notes if hero is near
+				dynsoundManager.play("harp", ""+(init_pentatone+current_note_), volume_, current_length_);
+				println("now singing note " + (current_note_) + " length: " + current_length_);
+			}, at_time_); // TODO: just for testing, remove '*4'
+  
   }
   
   void setFollowing(boolean b) {
@@ -335,17 +550,95 @@ class Koopa extends Interactor {
 	super.update();
 	
 	if (this.heroIsNear) {
+	
+		// only auto sing if no challenge and not beaten
+		if (activChallenge == false && this.beaten != true ) { this.sing(); }
 		rotateEnv.update(0.03); // TODO: add real framerate
 		this.r = rotateEnv.current_value;
-		float alpha_value = (1 - (this.distToHero/distToHeroInteraction))*255*2;
-		if (alpha_value > 255) alpha_value = 255; // just to be sure
-		this.layer.setFadeOutAlpha(alpha_value);
+		// if not beaten already darken screen when you get near
+		if (this.beaten == false){
+			float alpha_value = (1 - (this.distToHero/distToHeroInteraction))*255*2;
+			if (alpha_value > 255) alpha_value = 255; // just to be sure
+			this.layer.setFadeOutAlpha(alpha_value);
+		}
 	} else {
 		if (this.r != 0) { // TODO: add a tolerance
 			if (this.r > 0) {
 				this.r = this.r - (Math.PI*2/360);
 			} else {
 				this.r = this.r + (Math.PI*2/360);
+			}
+		}
+	}
+	
+	// only the current challenger has to do this
+	if ( this == challenger ) {
+		// challenge first part, creature starts singing after a while
+		if (activChallenge && endedSinging == false){
+			float now = millis();
+			float diff = ((now/1000)-(challengeStart/1000));
+			float diff_seconds = floor(diff);
+			if (now%1000) {
+				println( "Seconds:" + diff + " rounded: " + diff_seconds);
+			}
+			
+			if (diff_seconds < 1) { // TODO: wait till last note has been sung
+				// challenger.stopSinging(); // TODO
+			}
+			
+			// Remove instruction
+			if (diff_seconds >= 1 && diff_seconds < 2) { // TODO: change to 10, just for testing
+				// println("Remove text");
+				ltxt_instruction.setText('');
+				hero.changeText('');
+
+			}
+			if (diff_seconds >= 2 && diff_seconds < (2 + (challenger.current_song_length/1000) + 1)) { 
+				// println("Remove text");
+				ltxt_instruction.setText('Listen');
+				//  start singing
+				challenger.sing();
+			}
+			if (diff_seconds >= (2 + (challenger.current_song_length/1000) + 1)) { 
+				endedSinging = true; // end first part of challenge. now the hero has to sing
+				challengeHeroStart = millis(); // start timer for hero 
+			
+			}
+			
+		}
+		
+		// second part of challenge, creature ended, hero must sing now, ten seconds time
+		
+		if ( activChallenge && endedSinging ) {
+			float now = millis();
+			float diff = ((now/1000)-(challengeHeroStart/1000));
+			float diff_seconds = floor(diff);
+			int max_time = 30;
+			if (diff_seconds < 1 ) {
+				ltxt_instruction.setText('Sing, you have\n' + max_time +' secs time');
+			}
+			if (diff_seconds >= 1 && diff_seconds < max_time + 1) {
+				// here the hero sings
+				if (challenge_success) {
+					// reset challenge stuff
+					challenge_success = false;
+					activChallenge = false;
+					endedSinging = false;
+					ltxt_instruction.setText('It trusts you now');
+					setTimeout(function() { ltxt_instruction.setText('')}, 1500 );
+					challenger.beaten = true;
+					hero.changeText("Come with me!");
+					setTimeout(function() { hero.changeText("");}, 2000 );
+					this.layer.setFadeOutAlpha(0);
+				}
+			}
+			if (diff_seconds >= max_time + 1) { 
+				ltxt_instruction.setText("Challenge ended.\nYou failed");
+				// TODO: add instructional text
+				activChallenge = false;
+				endedSinging = false;
+				// now generate a new song, it should not be that easy
+				challenger.generateNewSong(song_length);				
 			}
 		}
 	}
@@ -357,35 +650,45 @@ class Koopa extends Interactor {
    	if (drawableFor(vx,vy,vw,vh)) {
 		// check distance to hero. if he is near start making noises/whistle and go in state "listen" if hero does it right
 		// println("hero is here: " + hero.getX());
-		distToHero = dist(this.getX(), this.getY(), hero.getX(), hero.getY());
-		if (distToHero <= distToHeroInteraction) {
-			if (heroIsNear) {
-				if (distToHero <= distToHeroActivateChallenge) {
-					challengeMode = true; // activate challenge!
+		if (activChallenge == false && this.beaten == false) {
+			distToHero = dist(this.getX(), this.getY(), hero.getX(), hero.getY());
+			if (distToHero <= distToHeroInteraction) {
+				if (heroIsNear) {
 					hero.changeText("What?! I have to sing?!");
+					if (distToHero <= distToHeroActivateChallenge) {
+						
+						if (challengeMode == false) {
+							challengeMode = true; // activate challenge!
+							// set this creature as challenger
+							challenger = this;
+							ltxt_instruction.setPosition(this.layer.parent.viewbox.x+(this.layer.parent.viewbox.w/6), this.layer.parent.viewbox.y+(4*this.layer.parent.viewbox.h/6));
+							ltxt_instruction.setText("Hit 'C' to accept\nthe challenge");
+						}
+					} else {
+						challengeMode = false; // deactivate challenge :/
+						ltxt_instruction.setText("");
+					}
+					
+				} else { // if it is false, turn it to true and initiate singing mode
+					println("hero is near!");
+					heroIsNear = true;
 				}
+			} else { // hero is too far away to interact
+				hero.changeText("");
+				if ( heroIsNear ) {
+					println("hero is not near anymore!");
+					heroIsNear = false;
+					rotateEnv.reset();
+				} else {
 				
-			} else { // if it is false, turn it to true and initiate singing mode
-				println("hero is near!");
-				heroIsNear = true;
-				
-				// if the hero have successfully challenged the animal it should follow him
-				if (this.beaten && this.following == false) {
-					hero.addFollower(this);
-					this.following = true;
 				}
-				
-			}
-		} else { // hero is too far away to interact
-			hero.changeText("");
-			if ( heroIsNear ) {
-				println("hero is not near anymore!");
-				heroIsNear = false;
-				rotateEnv.reset();
-			} else {
 			
 			}
-		
+		}
+		// if the hero have successfully challenged the animal it should follow him
+		if (this.beaten && this.following == false) {
+			hero.addFollower(this);
+			this.following = true;
 		}
 	}
    }

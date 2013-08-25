@@ -1688,7 +1688,8 @@ abstract class Level extends Screen {
 // Text which is in the level on a fixed position
 
 class LevelText implements Drawable {
-  float x, y, size;
+  float x, y; 
+  float text_size = 25;
   String font, text_string;
   boolean visible;
   Actor attached_to;
@@ -1696,14 +1697,14 @@ class LevelText implements Drawable {
   Envelope env;
   Envelope envX;
 
-	LevelText(String the_text, float x, float y, String font, float size) {
+	LevelText(String the_text, float x, float y, String font, float text_size) {
 		setPosition(x,y);
 		this.text_string = the_text;
 		this.font = font;
 		if (this.font) {
 			this.font_obj = createFont(this.font, 32);
 		}
-		this.size = size;
+		this.text_size = text_size;
 		this.visible = true;
 		this.env = new Envelope([0,0],[1],"repeat",0,"custom","Math.sin(y/15.75)*2");
 		this.envX = new Envelope([0,0],[2.5],"repeat",0,"custom","Math.sin(y/39.8)*2")
@@ -1730,16 +1731,20 @@ class LevelText implements Drawable {
   void draw(vx,vy,vw,vh) {
 	// TODO: only draw if in viewport
 	if (this.attached_to) { setPosition(this.attached_to.getX(), this.attached_to.getY()); }
-	if (this.size) textSize(this.size); 
+	if (this.text_size) textSize(this.text_size); 
 	if (this.font_obj) {
 		textFont(this.font_obj);
 	}
-
-	// TODO: remove, just workaround because size setting does not work
-	textSize(15);
-	float offset_x = -20;
-	float offset_y = -25;
-    fill(255); // TODO: the color
+	
+	textSize(this.text_size);
+	if (attached_to) {
+		float offset_x = -20;
+		float offset_y = -25;
+	} else {
+		float offset_x = 0;
+		float offset_y = 0;
+	}
+    fill(255); 
 	if (drawableFor(vx,vy,vw,vh)) {
 		this.env.update(1/30); // TODO: add real framerate here instead of 30
 		this.envX.update(1/30);
