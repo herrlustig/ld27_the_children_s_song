@@ -47,7 +47,30 @@
 
 		window.DynSoundManager = DynSoundManager; // constructor
 		window.dynsoundManager = dynsoundManager; // public API, flash callbacks etc.
+		
+		// vars for creatures
 		creatures_volume = 0.8;
+		init_singing_note = 24;
+		singing_instrument = "piccolo";
+		singing_instrument_hero = "englishhorn";
+		possible_instruments = ["clarinet", "flute", "piccolo", "tenor_trombone", "tuba", "horn"];		
+		// background music
+		var init_pentatone = 24;
+		var tempo_harp = 1000;
+		var octave_range = 2;
+		var instrument_set = ["male", "female"];
+		var background_volume = 0.05;
+		function playInterval() {
+			self.setInterval( function () {
+				// pentatonic array
+				var instr = instrument_set[Math.floor(Math.random()* (instrument_set.length+1))];
+				var pentatones = [0,2,4,7,9];
+				var the_chosen = pentatones[Math.floor(Math.random() * (pentatones.length + 1))];
+				var octave = Math.floor(Math.random()*octave_range)*12;
+				dynsoundManager.play(instr, ""+(the_chosen + octave + init_pentatone), background_volume); 
+			}, tempo_harp );
+		}
+
 		
 		// load some instruments
 		dynsoundManager._onFlashLoadCallback = function() {
@@ -60,32 +83,46 @@
 				dynsoundManager.load("female", "48", "audio/chorus-female-c5.mp3");
 				// dynsoundManager.load("female", "60", "audio/chorus-female-c6.mp3");
 				dynsoundManager.load("male", "24", "audio/chorus-male-c3.mp3");
-				// fadeout setting
-				dynsoundManager.setInstrumentSetting("harp","fade_out_time", "250") // in ms, only effects notes with a duration shorter then the sample used
-				dynsoundManager.setInstrumentSetting("female","fade_out_time", "250") // in ms, only effects notes with a duration shorter then the sample used
-				dynsoundManager.setInstrumentSetting("male","fade_out_time", "250") // in ms, only effects notes with a duration shorter then the sample used
-				dynsoundManager.setInstrumentSetting("piano","fade_out_time", "250") // in ms, only effects notes with a duration shorter then the sample used
+				
+				// creatures
+				dynsoundManager.load("englishhorn", "29", "audio/cor_anglais-f3.mp3");
+				dynsoundManager.load("englishhorn", "53", "audio/cor_anglais-f5.mp3");
+				dynsoundManager.load("flute", "24", "audio/flute-c3.mp3");
+				dynsoundManager.load("flute", "48", "audio/flute-c5.mp3");
+				dynsoundManager.load("piccolo", "36", "audio/piccolo-c4.mp3");
+				dynsoundManager.load("piccolo", "60", "audio/piccolo-c6.mp3");
+				dynsoundManager.load("clarinet", "29", "audio/clarinets-sus-f3.mp3");
+				dynsoundManager.load("clarinet", "53", "audio/clarinets-sus-f5.mp3");
+				dynsoundManager.load("bassoon", "19", "audio/bassoon-g2.mp3");
+				dynsoundManager.load("bassoon", "43", "audio/bassoon-g4.mp3");
+				dynsoundManager.load("horn", "19", "audio/horn-g2.mp3");
+				dynsoundManager.load("horn", "43", "audio/horn-g4.mp3");
+				dynsoundManager.load("tenor_trombone", "19", "audio/tenor_trombone-g2.mp3");
+				dynsoundManager.load("tenor_trombone", "43", "audio/tenor_trombone-g4.mp3");
+				dynsoundManager.load("tuba", "19", "audio/tuba-stc-rr1-g2.mp3");
+				dynsoundManager.load("tuba", "31", "audio/tuba-stc-rr1-g3.mp3");
+				
+				
+				
 
-				/*
+
+				// fadeout setting
+				dynsoundManager.setInstrumentSetting("harp","fade_out_time", "500") // in ms, only effects notes with a duration shorter then the sample used
+				dynsoundManager.setInstrumentSetting("female","fade_out_time", "500") // in ms, only effects notes with a duration shorter then the sample used
+				dynsoundManager.setInstrumentSetting("male","fade_out_time", "500") // in ms, only effects notes with a duration shorter then the sample 
+				dynsoundManager.setInstrumentSetting("piano","fade_out_time", "500") // in ms, only effects notes with a duration shorter then the sample used
+				dynsoundManager.setInstrumentSetting("englishhorn","fade_out_time", "500") // in ms, only effects notes with a duration shorter then the sample used
+				dynsoundManager.setInstrumentSetting("flute","fade_out_time", "500") // in ms, only effects notes with a duration shorter then the sample used
+				dynsoundManager.setInstrumentSetting("piccolo","fade_out_time", "500") // in ms, only effects notes with a duration shorter then the sample used
+				dynsoundManager.setInstrumentSetting("tuba","fade_out_time", "500") // in ms, only effects notes with a duration shorter then the sample used
+				dynsoundManager.setInstrumentSetting("horn","fade_out_time", "500") // in ms, only effects notes with a duration shorter then the sample used
+				dynsoundManager.setInstrumentSetting("tenor_trombone","fade_out_time", "500") // in ms, only effects notes with a duration shorter then the sample used
+				
+				// play background sound
 				playInterval();
-				playInterval();
-				*/
+				/* */
 		};
 
-		var init_pentatone = 12;
-		var tempo_harp = 1000;
-		var octave_range = 2;
-		var instrument_set = ["male", "female","harp"];
-		function playInterval() {
-			self.setInterval( function () {
-				// pentatonic array
-				var instr = instrument_set[Math.floor(Math.random()* (instrument_set.length+1))];
-				var pentatones = [0,2,4,7,9];
-				var the_chosen = pentatones[Math.floor(Math.random() * (pentatones.length + 1))];
-				var octave = Math.floor(Math.random()*octave_range)*12;
-				dynsoundManager.play(instr, ""+(the_chosen + octave + init_pentatone)); 
-			}, tempo_harp );
-		}
 		function stopAllIntervals () {
 			// Set a fake timeout to get the highest timeout id
 			var highestTimeoutId = setTimeout(";");

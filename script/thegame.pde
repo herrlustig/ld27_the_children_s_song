@@ -20,6 +20,7 @@ boolean challenge_success = false;
 Koopa challenger;
 song_length = 4; // TODO: this makes the hardness of the game :D
 
+
 void initialize() {
   addScreen("level", new HeroLevel(lvl_width, lvl_height));  
   println( "initialized");
@@ -413,7 +414,7 @@ class Hero extends Player {
 		}
 		
 	}
-	dynsoundManager.play("harp",""+(init_pentatone+noteNr),1,hero_note_length);
+	dynsoundManager.play(singing_instrument_hero,""+(init_pentatone+init_singing_note+noteNr),creatures_volume,hero_note_length);
   }
 }
 Hero hero;
@@ -424,6 +425,7 @@ class Koopa extends Interactor {
   boolean heroIsNear = false;
   final float distToHeroInteraction = 160; // sets distance for interaction, switches heroIsNear boolean
   final float distToHeroActivateChallenge = 80; // sets distance for interaction, switches heroIsNear boolean
+  String instrument = "piccolo";
 
   boolean following = false;
   boolean beaten = false; // if the hero successfully challenged the animal, this turns true
@@ -455,6 +457,9 @@ class Koopa extends Interactor {
 	
 	notes = new ArrayList<int>();
 	notes_length = new ArrayList<int>();
+	
+	// choose instrument for voice
+	instrument = possible_instruments[floor(Math.random()*possible_instruments.length)];
 	
 	generateNewSong(song_length); 
 	
@@ -534,9 +539,10 @@ class Koopa extends Interactor {
 	var current_note_ = note_nr;
 	var current_length_ = note_length_in_ms;
 	var at_time_ = time_to_play;
+	var thiscreature = this;
 	setTimeout( function () {
 				// TODO: only play notes if hero is near
-				dynsoundManager.play("harp", ""+(init_pentatone+current_note_), volume_, current_length_);
+				dynsoundManager.play(thiscreature.instrument, ""+(init_pentatone+init_singing_note+current_note_), volume_, current_length_);
 				println("now singing note " + (current_note_) + " length: " + current_length_);
 			}, at_time_); // TODO: just for testing, remove '*4'
   
