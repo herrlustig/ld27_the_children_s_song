@@ -1,5 +1,5 @@
-<html>
-<head>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 	<title> TODO: Game Name , Ludum Dare #27 Game Jam @Oerlikon, Switzerland</title>
 	<meta name="description" content="Experimental dynamic sound library using flash" /> 
 	<meta name="keywords" content="javascript sound, javascript audio, flash synthesis, Beat Kunz, javascript to flash communication" />
@@ -37,7 +37,7 @@
 	
 	<div id="the_screen">
 		<!--  -->
-		<canvas id="mecanvas" data-processing-sources='script/thegame.pde script/codebase_2.pde script/preloads.pde'></canvas> <!-- -->
+		<canvas id="mecanvas" tabindex="1" data-processing-sources='script/thegame.pde script/codebase_2.pde script/preloads.pde'></canvas> <!-- -->
 		<!--
 		<canvas id="mecanvas" data-processing-sources='script/sketch17.pde script/codebase_2.pde script/preloads.pde'></canvas> -->
 	</div>
@@ -50,9 +50,10 @@
 		
 		// vars for creatures
 		creatures_volume = 0.8;
+		hero_volume = 1;
 		init_singing_note = 24;
 		singing_instrument = "piccolo";
-		singing_instrument_hero = "englishhorn";
+		singing_instrument_hero = "harp";
 		possible_instruments = ["clarinet", "flute", "piccolo", "tenor_trombone", "tuba", "horn"];		
 		// background music
 		var init_pentatone = 24;
@@ -135,21 +136,19 @@
 		}
 		
 		$().ready(function () {
-			console.log("document ready");
-			/*
-			$(window).mousemove(function(e){
-			  var pageCoords = "( " + e.pageX + ", " + e.pageY + " )";
-			  var clientCoords = "( " + e.clientX + ", " + e.clientY + " )";
-			  // dynsoundManager.setNamedNoteSetting("test", "midiNr",""+((e.clientX/600) + (e.clientY/200) + 20)); 
+			document.getElementById("mecanvas").focus();
+		});
+		$("body").click(function () {
+			document.getElementById("mecanvas").focus();
+		});
 
-			});
-			*/ // TODO: remove
-			// MIDI.Player.setDynSoundManager(dynsoundManager); // TODO: check later if needed, else remove
-		})
+		
 	</script>
+	<!--
 	<div id='testbuttons'>
 	<button onclick="javascript:void(stopAllIntervals())">Stop Everything</button>
 	<button onclick="javascript:void(playInterval())">Play the 'random' tones</button>
 	</div>
+	-->
 </body>
 </html>

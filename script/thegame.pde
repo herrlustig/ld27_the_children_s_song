@@ -23,7 +23,7 @@ song_length = 4; // TODO: this makes the hardness of the game :D
 
 void initialize() {
   addScreen("level", new HeroLevel(lvl_width, lvl_height));  
-  println( "initialized");
+  // println( "initialized");
 }
 
 void reset() {
@@ -90,7 +90,7 @@ class HeroLayer extends LevelLayer {
 	*/
 	
 	
-	println( "added player hero");
+	// println( "added player hero");
 	
 	
 	// add decorative foreground bushes
@@ -210,7 +210,7 @@ class Hero extends Player {
     setImpulseCoefficients(DAMPENING,DAMPENING);
 	this.followers = new ArrayList<Positionable>();
 	played_notes = new ArrayList<int>();
-	println( "Hero initialized ");
+	// println( "Hero initialized ");
 
   }
   
@@ -252,7 +252,7 @@ class Hero extends Player {
   void addFollower(Koopa p) {
 	p.setFollowing(true)
 	this.followers.add(p);
-	println("the hero has now " + this.followers.size() + " followers");
+	// println("the hero has now " + this.followers.size() + " followers");
   }
   
   void setStates() {
@@ -366,37 +366,37 @@ class Hero extends Player {
   
   // plays notes and adds them to the played notes during challenge
   void playNote(int noteNr) {
-	println("hero played note " + noteNr);
+	// println("hero played note " + noteNr);
 	if(activChallenge && endedSinging) {
 		played_notes.add(noteNr);
 		// if more notes in played_notes then challengers melody, remove the first
 		if (played_notes.size() > challenger.notes.size()) {
 			played_notes.remove(0);
-			println("remove note because its longer then melody, first is now" + played_notes.get(0));
+			// println("remove note because its longer then melody, first is now" + played_notes.get(0));
 		}
 		
 		if (played_notes.size() == challenger.notes.size()) {
-			println("melody played has same size! check it now")
+			// println("melody played has same size! check it now")
 			is_success = true;
 			for ( int i = 0; i < challenger.notes.size(); i++;) {
 				if (played_notes.get(i) != challenger.notes.get(i)) {
-					println("NOT ok note " + played_notes.get(i) + "  , should be " + challenger.notes.get(i) )
+					// println("NOT ok note " + played_notes.get(i) + "  , should be " + challenger.notes.get(i) )
 					is_success = false;
 					break;
 				} else {
-					println("ok note " + played_notes.get(i))
+					// println("ok note " + played_notes.get(i))
 				}
 			
 			}
 			if (is_success) {
 				challenge_success = true;
-				println("SUCCESS!!!");
+				// println("SUCCESS!!!");
 
 			}
 		}
 		
 	}
-	dynsoundManager.play(singing_instrument_hero,""+(init_pentatone+init_singing_note+noteNr),creatures_volume,hero_note_length);
+	dynsoundManager.play(singing_instrument_hero,""+(init_pentatone+init_singing_note+noteNr),hero_volume,hero_note_length);
   }
 }
 Hero hero;
@@ -481,7 +481,7 @@ class Koopa extends Interactor {
 		}
 	}
 	this.current_song_length = total_length + ((this.notes.size()-1)*pause_between_notes)  + pause_at_end;
-	println("New song generated with total length of " + this.current_song_length + " With #" +notes.size() + " notes");
+	// println("New song generated with total length of " + this.current_song_length + " With #" +notes.size() + " notes");
   }
   
   void sing() {
@@ -492,7 +492,7 @@ class Koopa extends Interactor {
 		for(int i = 0; i < this.notes.size(); i++) {
 			s = s + this.notes.get(i) + " ";
 		}
-		println("start singing this: " + s);
+		// println("start singing this: " + s);
 		int delay_singing = 500; // 500 ms delay till singing
 		int at_time = delay_singing; 
 		float note_volume = creatures_volume; // TODO: change, let the distance to hero decide
@@ -509,7 +509,7 @@ class Koopa extends Interactor {
 		thisanimal = this;
 		setTimeout(function () { 
 			thisanimal.isSinging = false; 
-			println("stop singing");
+			// println("stop singing");
 		},this.current_song_length+delay_singing)
 		
 	}
@@ -525,7 +525,7 @@ class Koopa extends Interactor {
 	setTimeout( function () {
 				// TODO: only play notes if hero is near
 				dynsoundManager.play(thiscreature.instrument, ""+(init_pentatone+init_singing_note+current_note_), volume_, current_length_);
-				println("now singing note " + (current_note_) + " length: " + current_length_);
+				// println("now singing note " + (current_note_) + " length: " + current_length_);
 			}, at_time_); // TODO: just for testing, remove '*4'
   
   }
@@ -567,7 +567,7 @@ class Koopa extends Interactor {
 			float diff = ((now/1000)-(challengeStart/1000));
 			float diff_seconds = floor(diff);
 			if (now%1000) {
-				println( "Seconds:" + diff + " rounded: " + diff_seconds);
+				// println( "Seconds:" + diff + " rounded: " + diff_seconds);
 			}
 			
 			if (diff_seconds < 1) { // TODO: wait till last note has been sung
@@ -658,13 +658,13 @@ class Koopa extends Interactor {
 					}
 					
 				} else { // if it is false, turn it to true and initiate singing mode
-					println("hero is near!");
+					// println("hero is near!");
 					heroIsNear = true;
 				}
 			} else { // hero is too far away to interact
 				hero.changeText("");
 				if ( heroIsNear ) {
-					println("hero is not near anymore!");
+					// println("hero is not near anymore!");
 					heroIsNear = false;
 					rotateEnv.reset();
 				} else {
