@@ -39,6 +39,9 @@ abstract class Actor extends Positionable {
 
   // The active state for this actor (with associated sprite)
   State active;
+  
+  // LevelText can be hooked to the Actor
+  LevelText actorText;
 
   // all states for this actor
   HashMap<String, State> states;
@@ -57,7 +60,19 @@ abstract class Actor extends Positionable {
     this(_name);
     setImpulseCoefficients(dampening_x, dampening_y);
   }
-
+ 
+  void setActorText(LevelText lt) {
+	this.actorText = lt;
+  }
+  
+  void changeText(String s){
+	if (this.actorText) {
+		this.actorText.setText(s);
+	}
+  }
+  
+  
+  
   /**
    * Add a state to this actor's repetoire.
    */
@@ -106,7 +121,7 @@ abstract class Actor extends Positionable {
    */
   void setCurrentState(String name) {
     State tmp = states.get(name);
-    if (active != null && tmp != active) {
+    if (tmp && active != null && tmp != active) {
       tmp.reset();
       swapStates(tmp);
     } else { active = tmp; }
@@ -1676,7 +1691,7 @@ class LevelText implements Drawable {
   float x, y, size;
   String font, text_string;
   boolean visible;
-  Positionable attached_to;
+  Actor attached_to;
   Object font_obj;
   Envelope env;
   Envelope envX;
@@ -1690,19 +1705,23 @@ class LevelText implements Drawable {
 		}
 		this.size = size;
 		this.visible = true;
-		this.env = new Envelope([0,0],[1],"repeat",0,"custom","Math.sin(y/15.75)");
-		this.envX = new Envelope([0,0],[2.5],"repeat",0,"custom","Math.sin(y/39.8)")
+		this.env = new Envelope([0,0],[1],"repeat",0,"custom","Math.sin(y/15.75)*2");
+		this.envX = new Envelope([0,0],[2.5],"repeat",0,"custom","Math.sin(y/39.8)*2")
 		this.env.start();
 		this.env.repeat = true;
 		this.envX.start();
 		this.envX.repeat = true;
 	}
 	
-	void attach_to(Positionable a) {
+	void attach_to(Actor a) {
 		this.attached_to = a;
+		a.setActorText(this); // TODO: necassaay for diaglog with little animals
 	}
 	void setVisible(boolean b) {
 		this.visible = b;
+	}
+	void setText(String s) {
+		this.text_string = s;
 	}
 	void setPosition(float _x, float _y) {
 		x = _x;
@@ -1711,16 +1730,20 @@ class LevelText implements Drawable {
   void draw(vx,vy,vw,vh) {
 	// TODO: only draw if in viewport
 	if (this.attached_to) { setPosition(this.attached_to.getX(), this.attached_to.getY()); }
-	if (this.size) textSize(this.size);
+	if (this.size) textSize(this.size); 
 	if (this.font_obj) {
 		textFont(this.font_obj);
 	}
 
+	// TODO: remove, just workaround because size setting does not work
+	textSize(15);
+	float offset_x = -20;
+	float offset_y = -25;
     fill(255); // TODO: the color
 	if (drawableFor(vx,vy,vw,vh)) {
 		this.env.update(1/30); // TODO: add real framerate here instead of 30
 		this.envX.update(1/30);
-		text (this.text_string, this.x + this.env.current_value, this.y + this.env.current_value);
+		text (this.text_string, offset_x + this.x + this.env.current_value, offset_y + this.y + this.env.current_value);
 	}
   }
   /**
@@ -1766,6 +1789,7 @@ abstract class LevelLayer {
   // The various layer components
   ArrayList<Boundary> boundaries;
   ArrayList<Drawable> fixed_background, fixed_foreground;
+  float fadeOutAlpha;
   ArrayList<Drawable> fixed_text;
   ArrayList<Pickup> pickups;
   ArrayList<Pickup> npcpickups;
@@ -1802,6 +1826,8 @@ abstract class LevelLayer {
   void removeBackgroundSprite(Drawable fixed) { fixed_background.remove(fixed); }
   void clearBackground() { fixed_background.clear(); }
 
+  // set fadeout alpha value;
+  void setFadeOutAlpha(float alpha_v) { fadeOutAlpha = alpha_v };
   // The list of static, non-interacting sprites, building up the foreground
   void addForegroundSprite(Drawable fixed)    { fixed_foreground.add(fixed);    }
   void removeForegroundSprite(Drawable fixed) { fixed_foreground.remove(fixed); }
@@ -1921,6 +1947,7 @@ abstract class LevelLayer {
     
     boundaries = new ArrayList<Boundary>();
     fixed_background = new ArrayList<Drawable>();
+	fadeOutAlpha = 0; // just to test
     fixed_foreground = new ArrayList<Drawable>();
     fixed_text = new ArrayList<Drawable>();
     pickups = new ArrayList<Pickup>();
@@ -2024,7 +2051,8 @@ abstract class LevelLayer {
     if (showBackground) { handleBackground(x,y,w,h); } else { debugfunctions_drawBackground((int)width, (int)height); }
     if (showBoundaries)   handleBoundaries(x,y,w,h);
     if (showPickups)      handlePickups(x,y,w,h);
-    if (showInteractors)  handleNPCs(x,y,w,h);
+	handleFadeOut(x,y,w,h);
+    if (showInteractors)  handleNPCs(x,y,w,h); // TODO: sort by y value, biggest gets drawed first
     if (showActors)       handlePlayers(x,y,w,h);
     if (showDecals)       handleDecals(x,y,w,h);
     if (showForeground)   handleForeground(x,y,w,h);
@@ -2125,6 +2153,14 @@ abstract class LevelLayer {
     }
   }
 
+  void handleFadeOut(float x, float y, float w, float h) {
+     noStroke();
+	 fill(0,0,0,fadeOutAlpha);
+	 rect(x-10, y-10, w+20, h+20);
+  
+  }
+
+  
   /**
    * Handle both regular and bounded NPCs
    */
