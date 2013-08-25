@@ -48,13 +48,20 @@
 		window.DynSoundManager = DynSoundManager; // constructor
 		window.dynsoundManager = dynsoundManager; // public API, flash callbacks etc.
 		
+		song_length = 5;
+		
 		// vars for creatures
 		creatures_volume = 0.8;
-		hero_volume = 1;
+		hero_volume = 0.9;
 		init_singing_note = 24;
+		init_singing_note_mother = -36;
+		init_singing_hero = -12;
+
 		singing_instrument = "piccolo";
-		singing_instrument_hero = "harp";
-		possible_instruments = ["clarinet", "flute", "piccolo", "tenor_trombone", "tuba", "horn"];		
+		singing_instrument_hero = "englishhorn";
+		possible_instruments = ["clarinet", "flute", "piccolo", "tenor_trombone", "tuba", "horn"];
+		mother_instrument = "tuba";
+		
 		// background music
 		var init_pentatone = 24;
 		var tempo_harp = 1000;
@@ -142,13 +149,36 @@
 			document.getElementById("mecanvas").focus();
 		});
 
+		setInterval(function () { 
+			if ( typeof(dynsoundManager.flash._play) == "function" ) {
+				$("#flash_state").html("is Active<br/> Have fun :)");
+			} else {
+				$("#flash_state").html("is DOWN<br/> YOU CAN NOT PLAY THE GAME LIKE THAT. <br/> Flash should be at least version 10 <br/> The browser recommendation is chrome");
+				$("#flash_state").css("color", "red");
+			}
+		}, 1000);
 		
 	</script>
-	<!--
+	
 	<div id='testbuttons'>
+	<h2>Instructions</h2>
+	<h3>Loading </h3>
+	<p>The loading is a little bit slow. Please be patient :)</p>
+	<p>It works best with chrome</p>
+	<p>Flash is necessary to play this game. See below if it works.</p>
+	<h3>Controls</h3>
+	<p> Move with: W A S D</p>
+	<p> Accept challenge: C</p>
+	<p> Your instrument is mapped on:</p>
+	<p> Keyboard keys <b> F G H J K L</b></p>
+	<br/>
+	<h3>Flash State </h3>
+	<p> Flash (the music engine) is: <b><span id="flash_state" style="color: green;">Active</span></b></p>
+	<!--
 	<button onclick="javascript:void(stopAllIntervals())">Stop Everything</button>
 	<button onclick="javascript:void(playInterval())">Play the 'random' tones</button>
-	</div>
 	-->
+	</div>
+	
 </body>
 </html>

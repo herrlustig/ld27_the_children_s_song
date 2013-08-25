@@ -5,6 +5,8 @@ float DOWN_FORCE = 2;
 float ACCELERATION = 1.3;
 float DAMPENING = 0.75;
 
+width = 2000;
+height = 2000;
 int lvl_width = 1000;
 int lvl_height = 1000;
 
@@ -17,8 +19,10 @@ float challengeStart = 0; // in milliseconds
 float challengeStartHeroSing = 0; // in milliseconds
 int lastSecond = -1; 
 boolean challenge_success = false;
-Koopa challenger;
-song_length = 4; // TODO: this makes the hardness of the game :D
+Creature challenger;
+
+boolean game_finished = false;
+int creature_count;
 
 
 void initialize() {
@@ -47,7 +51,7 @@ class MainBackgroundLayer extends LevelLayer {
   MainBackgroundLayer(Level owner) {
     super(owner, owner.width, owner.height, 0,0, 0.75,0.75);
     setBackgroundColor(color(0, 100, 190));
-    // addBackgroundSprite(new TilingSprite(new Sprite("graphics/backgrounds/sky_2.gif"),0,0,width,height)); // TODO: remove , not needed in this game
+    // addBackgroundSprite(new TilingSprite(new Sprite("graphics/floor_2.gif"),0,0,width,height)); // TODO: remove , not needed in this game
   }
   void draw() {
     super.draw();
@@ -58,105 +62,62 @@ class MainBackgroundLayer extends LevelLayer {
 class HeroLayer extends LevelLayer {
   HeroLayer(Level owner) {
     super(owner);
-    addBackgroundSprite(new TilingSprite(new Sprite("graphics/backgrounds/sky.gif"),0,0,width,height));
+    addBackgroundSprite(new TilingSprite(new Sprite("graphics/floor.gif"),0,0,width,height));
 
-    addBoundary(new Boundary(0,height-48,width,height-48));
+	// walls
+    addBoundary(new Boundary(0,height-10,width,height-10));
+    addBoundary(new Boundary(width,10,0,10));
+	addBoundary(new Boundary(0,0,0,height));
+	addBoundary(new Boundary(width-10,height, width-10,0));
+	
+
     showBoundaries = true;
     hero = new Hero(width/2, height/2);
-	hero.setPosition(10, 200);
+	hero.setPosition(100, 100);
     addPlayer(hero);
-	Koopa koopa1 = new Koopa(64, height-64);
-	Koopa koopa2 =  new Koopa(300, height-64);
-	Koopa koopa3 =  new Koopa(780, height-64);
-	Koopa koopa4 =  new Koopa(840, height-64);
-	Koopa koopa9 =  new Koopa(200, 200);
-	addInteractor(koopa1);
-	addInteractor(koopa2);
-	addInteractor(koopa3);
-	addInteractor(koopa4);
-	addInteractor(koopa9);
+	Creature creature1 = new Creature(64, height-64);
+	Creature creature2 =  new Creature(300, height-64);
+	Creature creature3 =  new Creature(780, height-64 -300);
+	Creature creature4 =  new Creature(840, height-64 -100);
+	Creature creature5 =  new Creature(200, height-64- 200);
+	addInteractor(creature1);
+	addInteractor(creature2);
+	addInteractor(creature3);
+	addInteractor(creature4);
+	addInteractor(creature5);
 	
+	// just for testing
 	/*
-	hero.addFollower(koopa1);
-	hero.addFollower(koopa2);
-	hero.addFollower(koopa3);
-	hero.addFollower(koopa4);
-	hero.addFollower(koopa5);
-	hero.addFollower(koopa6);
-	hero.addFollower(koopa7);
-	hero.addFollower(koopa8);
-	hero.addFollower(koopa9);
+	hero.addFollower(creature1);
+	creature1.following = true;
+	hero.addFollower(creature2);
+	creature2.following = true;
+	hero.addFollower(creature3);
+	creature3.following = true;
+	hero.addFollower(creature4);
+	creature4.following = true;
+	hero.addFollower(creature5);
+	creature5.following = true;
 	
+	creature_count = 5;
 	*/
+	
+	MotherCreature mother =  new MotherCreature(600, 200);
+	addInteractor(mother);
+
 	
 	
 	// println( "added player hero");
-	
-	
-	// add decorative foreground bushes
-    addBushes();
 	LevelText ltxt1 = new LevelText("", 20, height-64, "fonts/acmesa.ttf", 20);
 	ltxt1.attach_to(hero);
 	// hero.changeText("changed text");
 	addText(ltxt1);
 	
-	ltxt_instruction = new LevelText("", 0, 0, "fonts/acmesa.ttf", 30);
+	ltxt_instruction = new LevelText("", 0, 0, "fonts/acmesa.ttf", 20);
 	addText(ltxt_instruction);
 
 	
 
-  }
-  
-  
-  // add some mario-style bushes
-  void addBushes() {
-    // one bush, composed of four segmetns (sprites 1, 3, 4 and 5)
-    int[] bush = {
-      1, 3, 4, 5
-    };
-    for (int i=0, xpos=0, end=bush.length; i<end; i++) {
-      Sprite sprite = new Sprite("graphics/backgrounds/bush-0"+bush[i]+".gif");
-      xpos += sprite.width;
-      sprite.align(CENTER, BOTTOM);
-      sprite.setPosition(116 + xpos, height-48);
-      addForegroundSprite(sprite);
-    }
-
-    // two bush, composed of eight segments
-    bush = new int[] {
-      1, 2, 4, 2, 3, 4, 2, 5
-    };
-    for (int i=0, xpos=0, end=bush.length; i<end; i++) {
-      Sprite sprite = new Sprite("graphics/backgrounds/bush-0"+bush[i]+".gif");
-      xpos += sprite.width;
-      sprite.align(CENTER, BOTTOM);
-      sprite.setPosition(384 + xpos, height-48);
-      addForegroundSprite(sprite);
-    }
-
-    // three bush
-    bush = new int[] {
-      1, 3, 4, 5
-    };
-    for (int i=0, xpos=0, end=bush.length; i<end; i++) {
-      Sprite sprite = new Sprite("graphics/backgrounds/bush-0"+bush[i]+".gif");
-      xpos += sprite.width;
-      sprite.align(CENTER, BOTTOM);
-      sprite.setPosition(868 + xpos, height-48);
-      addForegroundSprite(sprite);
-    }
-
-    // four bush
-    bush = new int[] {
-      1, 2, 4, 3, 4, 5
-    };
-    for (int i=0, xpos=0, end=bush.length; i<end; i++) {
-      Sprite sprite = new Sprite("graphics/backgrounds/bush-0"+bush[i]+".gif");
-      xpos += sprite.width;
-      sprite.align(CENTER, BOTTOM);
-      sprite.setPosition(1344 + xpos, height-48);
-      addForegroundSprite(sprite);
-    }
   }
   
   void draw() {
@@ -235,10 +196,12 @@ class Hero extends Player {
 	  float angle = atan2(dy, dx);
 	  float new_distanceX = dx - 1;
 	  float new_distanceY = dy - 1;
-	  if (new_distanceX < this.followDistance) { new_distanceX = this.followDistance };
-	  if (new_distanceY < this.followDistance) { new_distanceY = this.followDistance };
-	  float x = xin - cos(angle) * new_distanceX; // this.followDistance;
-	  float y = yin - sin(angle) * new_distanceX; // this.followDistance;
+	  float scaleSizeX = p.sx*32;
+	  float scaleSizeY = p.sy*60;
+	  if (new_distanceX < this.followDistance + scaleSizeX) { new_distanceX = this.followDistance  + scaleSizeX};
+	  if (new_distanceY < this.followDistance + scaleSizeY) { new_distanceY = this.followDistance  + scaleSizeY};
+	  float x = xin - cos(angle) * new_distanceX; 
+	  float y = yin - sin(angle) * new_distanceX; 
 	  p.setPosition(x,y);
 	  // TODO: set the same movement state
 	  p.setCurrentState("idle");
@@ -249,7 +212,7 @@ class Hero extends Player {
   
   
   
-  void addFollower(Koopa p) {
+  void addFollower(Creature p) {
 	p.setFollowing(true)
 	this.followers.add(p);
 	// println("the hero has now " + this.followers.size() + " followers");
@@ -257,10 +220,10 @@ class Hero extends Player {
   
   void setStates() {
     // idling state
-    addState(new State("idle", "graphics/mario/small/Standing-mario.gif"));
+    addState(new State("idle", "graphics/Standing-hero.gif"));
 
     // running state
-    addState(new State("running", "graphics/mario/small/Running-mario.gif", 1, 4));
+    addState(new State("running", "graphics/Running-hero.gif", 1, 4));
 
     // default: just stand around doing nothing
     setCurrentState("idle");
@@ -396,13 +359,13 @@ class Hero extends Player {
 		}
 		
 	}
-	dynsoundManager.play(singing_instrument_hero,""+(init_pentatone+init_singing_note+noteNr),hero_volume,hero_note_length);
+	dynsoundManager.play(singing_instrument_hero,""+(init_pentatone+init_singing_hero+init_singing_note+noteNr),hero_volume,hero_note_length);
   }
 }
 Hero hero;
 
 
-class Koopa extends Interactor {
+class Creature extends Interactor {
   float distToHero = 200000; // big default value
   boolean heroIsNear = false;
   final float distToHeroInteraction = 160; // sets distance for interaction, switches heroIsNear boolean
@@ -424,16 +387,24 @@ class Koopa extends Interactor {
   int current_song_length = 0; // in milliseconds
   int pause_between_notes = 300;
   int pause_at_end = 1500;
+  float sx_orig = 1;
+  float sy_orig = 1;
 
 
-  Koopa(float x, float y) {
-    super("Koopa Trooper");
+  Creature(float x, float y) {
+    super("Creature");
     setStates();
     setImpulseCoefficients(DAMPENING, DAMPENING);
     setPosition(x,y);
 	// TODO: this needs quite time, copy object template as solution?
 	rotateEnv = new Envelope([0,0],[1],"repeat",0,"custom","Math.sin(y/15.75)*(Math.PI*2/30)");
 	rotateEnv.start();
+	
+	// scale 
+	this.sx_orig = 1+ (Math.random()/2);
+	this.sy_orig = 1+ (Math.random()/2);
+	this.sx = this.sx_orig; ;//2;
+	this.sy = this.sy_orig;//2;
 	
 	// melody stuff
 	
@@ -484,9 +455,10 @@ class Koopa extends Interactor {
 	// println("New song generated with total length of " + this.current_song_length + " With #" +notes.size() + " notes");
   }
   
+  // creature sing
   void sing() {
 	// only start singing if not currently singing
-	if (this.isSinging == false) {
+	if (this.isSinging == false && game_finished != true) {
 		this.isSinging = true;
 		String s = "";
 		for(int i = 0; i < this.notes.size(); i++) {
@@ -506,13 +478,19 @@ class Koopa extends Interactor {
 			at_time = at_time + current_length + (i*pause_between_notes);
 		}
 		// also set timeout function to stop singing
-		thisanimal = this;
-		setTimeout(function () { 
-			thisanimal.isSinging = false; 
-			// println("stop singing");
-		},this.current_song_length+delay_singing)
+		stopSinging(this, this.current_song_length+delay_singing);
 		
 	}
+  
+  }
+  
+  void stopSinging(Positionable thisanimal, int when_to_stop) {
+		var thisanimal_ = thisanimal;
+		var when_ = when_to_stop;
+		setTimeout(function () { 
+			thisanimal_.isSinging = false; 
+			// println("stop singing");
+		},when_)
   
   }
   
@@ -544,9 +522,10 @@ class Koopa extends Interactor {
 		rotateEnv.update(0.03); // TODO: add real framerate
 		this.r = rotateEnv.current_value;
 		// if not beaten already darken screen when you get near
-		if (this.beaten == false){
+		if (this.beaten == false && game_finished != true){
 			float alpha_value = (1 - (this.distToHero/distToHeroInteraction))*255*2;
 			if (alpha_value > 255) alpha_value = 255; // just to be sure
+			// println("Creature, set fade out to " + alpha_value);
 			this.layer.setFadeOutAlpha(alpha_value);
 		}
 	} else {
@@ -617,11 +596,14 @@ class Koopa extends Interactor {
 					challenger.beaten = true;
 					hero.changeText("Come with me!");
 					setTimeout(function() { hero.changeText("");}, 2000 );
-					this.layer.setFadeOutAlpha(0);
+					this.layer.setFadeOutAlpha(255);
 				}
 			}
 			if (diff_seconds >= max_time + 1) { 
-				ltxt_instruction.setText("Challenge ended.\nYou failed");
+				ltxt_instruction.setText("Challenge ended.\nIt does not trust you.");
+				setTimeout( function() {
+					ltxt_instruction.setText("Try again, Hit 'C'");
+				}, 1500);
 				// TODO: add instructional text
 				activChallenge = false;
 				endedSinging = false;
@@ -638,10 +620,11 @@ class Koopa extends Interactor {
    	if (drawableFor(vx,vy,vw,vh)) {
 		// check distance to hero. if he is near start making noises/whistle and go in state "listen" if hero does it right
 		// println("hero is here: " + hero.getX());
-		if (activChallenge == false && this.beaten == false) {
+		if (game_finished != true && activChallenge == false && this.beaten == false) {
 			distToHero = dist(this.getX(), this.getY(), hero.getX(), hero.getY());
 			if (distToHero <= distToHeroInteraction) {
 				if (heroIsNear) {
+					this.sing();
 					hero.changeText("What?! I have to sing?!");
 					if (distToHero <= distToHeroActivateChallenge) {
 						
@@ -650,7 +633,7 @@ class Koopa extends Interactor {
 							// set this creature as challenger
 							challenger = this;
 							ltxt_instruction.setPosition(this.layer.parent.viewbox.x+(this.layer.parent.viewbox.w/6), this.layer.parent.viewbox.y+(4*this.layer.parent.viewbox.h/6));
-							ltxt_instruction.setText("Hit 'C' to accept\nthe challenge");
+							ltxt_instruction.setText("Hit 'C' to accept\nthe song challenge");
 						}
 					} else {
 						challengeMode = false; // deactivate challenge :/
@@ -686,11 +669,280 @@ class Koopa extends Interactor {
    */
   void setStates() {
     // walking state
-    State walking = new State("idle", "graphics/enemies/Red-koopa-walking.gif", 1, 2);
+    // State walking = new State("idle", "graphics/creature-walking.gif", 1, 2);
+    State walking = new State("idle", "graphics/creature.gif", 1, 1);
+
+	
     walking.setAnimationSpeed(0.12);
     // SoundManager.load(walking, "audio/Squish.mp3");
     addState(walking);
-	State idle = new State("idle", "graphics/enemies/Red-koopa-walking.gif", 1, 2);
+	//  sState idle = new State("idle", "graphics/creature-walking.gif", 1, 2);
+	State idle = new State("idle", "graphics/creature.gif", 1, 1);
+
+    idle.setAnimationSpeed(0);
+    addState(idle);
+    
+    setCurrentState("idle");
+  }
+}
+
+
+
+class MotherCreature extends Interactor {
+  float distToHero = 200000; // big default value
+  boolean heroIsNear = false;
+  final float distToHeroInteraction = 300; // sets distance for interaction, switches heroIsNear boolean
+  final float distToHeroActivateChallenge = 0; // sets distance for interaction, switches heroIsNear boolean
+  String instrument = "tuba";
+
+  Envelope rotateEnv;
+  
+  boolean isSinging = false; 
+  
+  ArrayList<int> notes;
+  ArrayList<int> notes_length; // in milliseconds
+  
+  float singing_timer = 0;
+  int current_note = 0;
+  int current_song_length = 0; // in milliseconds
+  int pause_between_notes = 300;
+  int pause_at_end = 1500;
+  float sx_orig = 1;
+  float sy_orig = 1;
+
+  boolean beaten = false;
+  boolean following = false;
+
+  MotherCreature(float x, float y) {
+    super("MotherCreature");
+    setStates();
+    setImpulseCoefficients(DAMPENING, DAMPENING);
+    setPosition(x,y);
+	// TODO: this needs quite time, copy object template as solution?
+	rotateEnv = new Envelope([0,0],[1],"repeat",0,"custom","Math.sin(y/15.75)*(Math.PI*2/30)");
+	rotateEnv.start();
+	
+	// scale 
+	this.sx_orig = 5.5*1.5;
+	this.sy_orig = 5*1.5;
+	this.sx = this.sx_orig; 
+	this.sy = this.sy_orig;
+	
+	// melody stuff
+	
+	notes = new ArrayList<int>();
+	notes_length = new ArrayList<int>();
+	
+	generateNewSong(song_length); 
+	
+  }
+  
+  
+  // melody_length, nr of notes
+  void generateNewSong(int melody_length) {
+	// stop current singing
+	isSinging = false;
+	// clear the old melody
+	notes.clear();
+	notes_length.clear();
+	int total_length = 0; // millisec, keep track of how long the song goes
+	int max_song_length = 4000; // a maximum of 4 seconds
+	ArrayList<int> possible_notes = new ArrayList<int>(); // TODO: influence by environment tonality
+	possible_notes.add(0);
+	possible_notes.add(2); 
+	possible_notes.add(4); 
+	possible_notes.add(7); 
+	possible_notes.add(9);
+	possible_notes.add(12);
+	possible_notes.add(14);
+	possible_notes.add(16); 
+	possible_notes.add(19); 
+	possible_notes.add(21); 
+	possible_notes.add(24);
+	ArrayList<int> possible_lengths = new ArrayList<int>(); // TODO: could be influenced by environment rhythm
+	possible_lengths.add(250); 
+	possible_lengths.add(500);
+	possible_lengths.add(1000);
+	possible_lengths.add(1000); 
+	possible_lengths.add(1500);
+	possible_lengths.add(2000); 
+	for(int i = 0; total_length <= max_song_length && notes.size() < melody_length; i++) {
+		// pick a note
+		int new_note = possible_notes.get(floor(Math.random()*(possible_notes.size()-1)));
+		// pick its length
+		int new_length = possible_lengths.get(floor(Math.random()*(possible_lengths.size()-1)));
+		if ( total_length + new_length <= max_song_length) {
+			notes.add(new_note);
+			notes_length.add(new_length);
+			total_length = total_length + new_length;
+		} else {
+			break
+		}
+	}
+	this.current_song_length = total_length + ((this.notes.size()-1)*pause_between_notes)  + pause_at_end;
+	// println("Mother: New song generated with total length of " + this.current_song_length + " With #" +notes.size() + " notes");
+  }
+  
+  void sing() {
+	// only start singing if not currently singing
+	if (this.isSinging == false) {
+		generateNewSong(8); // TODO: add sometimes, the mother can sing longer
+		this.isSinging = true;
+		String s = "";
+		// TODO: remove this loop, only for debug
+		for(int i = 0; i < this.notes.size(); i++) {
+			s = s + this.notes.get(i) + " ";
+		}
+		// println("Mother: start singing this: " + s);
+		int delay_singing = 500; // 500 ms delay till singing
+		int at_time = delay_singing; 
+		float note_volume = creatures_volume; // TODO: change, let the distance to hero decide
+		for (int i = 0; i < this.notes.size(); i++) {
+			var current_note = this.notes.get(i);
+			var current_length = this.notes_length.get(i);
+			// println("plan to sing singing note " + (24+current_note) + " length: " + current_length);
+			scheduleNote(current_note, current_length, at_time, note_volume);
+
+			
+			at_time = at_time + current_length + (i*pause_between_notes);
+		}
+		// also set timeout function to stop singing
+		// also set timeout function to stop singing
+		stopSinging(this, this.current_song_length+delay_singing);
+		
+	}
+  
+  }
+  
+  void stopSinging(Positionable thisanimal, int when_to_stop) {
+		var thisanimal_ = thisanimal;
+		var when_ = when_to_stop;
+		setTimeout(function () { 
+			thisanimal_.isSinging = false; 
+			// println("stop singing");
+		},when_)
+  }
+  
+  void scheduleNote(int note_nr, int note_length_in_ms, time_to_play, float note_volume) {
+	var volume_ = note_volume;
+	var current_note_ = note_nr;
+	var current_length_ = note_length_in_ms;
+	var at_time_ = time_to_play;
+	var thiscreature = this;
+	setTimeout( function () {
+				// TODO: only play notes if hero is near
+				dynsoundManager.play(mother_instrument, ""+(init_pentatone+init_singing_note+init_singing_note_mother+current_note_), volume_, current_length_);
+				// println("Mother: now singing note " + (current_note_) + " length: " + current_length_);
+			}, at_time_); // TODO: just for testing, remove '*4'
+  
+  }
+  
+  void setFollowing(boolean b) {
+	following = true;
+  
+  }
+   void update() {
+	super.update();
+	
+	if (this.heroIsNear) {
+	
+		// only auto sing if no challenge and not beaten
+		if (activChallenge == false && this.beaten != true ) { this.sing(); }
+		rotateEnv.update(0.010); // TODO: add real framerate
+		this.r = rotateEnv.current_value;
+		// if not beaten already darken screen when you get near
+		if (this.beaten == false && game_finished != true){
+			float alpha_value = (1 - (this.distToHero/distToHeroInteraction))*255*2;
+			if (alpha_value > 255) alpha_value = 255; // just to be sure
+			// println("Mother:, set fade out to " + alpha_value);
+			this.layer.setFadeOutAlpha(alpha_value);
+		}
+	} else {
+		if (this.r != 0) { // TODO: add a tolerance
+			if (this.r > 0) {
+				this.r = this.r - (Math.PI*2/640); //  Mother moves slower
+			} else {
+				this.r = this.r + (Math.PI*2/640);
+			}
+		}
+	}
+	
+   }
+   
+   void draw(vx, vy, vw, vh) {
+    super.draw(vx, vy, vw, vh);
+   	if (drawableFor(vx,vy,vw,vh)) {
+		// check distance to hero. if he is near start making noises/whistle and go in state "listen" if hero does it right
+		if (game_finished != true && activChallenge == false && this.beaten == false) {
+			distToHero = dist(this.getX(), this.getY(), hero.getX(), hero.getY());
+			// println("Mother: draw at " + this.getX() + " " + this.getY() + " DIST TO HERO: " + distToHero);
+			if (distToHero <= distToHeroInteraction) {
+				// println("Mother: hero is in range");
+
+				if (heroIsNear) {
+					this.sing();
+					// check if all children are there
+					if (game_finished == false && hero.followers.size() == creature_count) {
+						game_finished = true;
+						this.beaten = true;
+						println("Game finished!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+						// follow hero too!
+						hero.addFollower(this);
+						this.following = true;
+						instrument_set = ["male","female","clarinet", "flute", "piccolo", "tenor_trombone", "tuba", "horn", "englishhorn"];
+						// playInterval(); // this function is defined in index.html // TODO: readd
+						ltxt_instruction.setPosition(this.layer.parent.viewbox.x+(this.layer.parent.viewbox.w/6), this.layer.parent.viewbox.y+(4*this.layer.parent.viewbox.h/6));
+						ltxt_instruction.setText("Thank you");
+						this.layer.setFadeOutAlpha(255);
+					}
+					if (game_finished == false) {
+						hero.changeText("What do you want from me?");
+						ltxt_instruction.setPosition(this.layer.parent.viewbox.x+(this.layer.parent.viewbox.w/6), this.layer.parent.viewbox.y+(4*this.layer.parent.viewbox.h/6));
+						ltxt_instruction.setText("Bring me my children\nGain their trust...\nsing to them");
+					}
+					
+				} else { // if it is false, turn it to true and initiate singing mode
+					// println("Mother: hero is near!");
+					this.heroIsNear = true;
+				} 
+				
+			} else { // hero is too far away to interact
+				hero.changeText("");
+				if ( heroIsNear ) {
+					// println("hero is not near anymore!");
+					heroIsNear = false;
+					rotateEnv.reset();
+				} else {
+				
+				}
+				
+			
+			}
+		}
+		
+		if (this.beaten && this.following == true) {
+			this.sing();
+		}
+	} else {
+		// println("Mother: should not be drawn");
+	}
+   }
+  
+  /**
+   * Set up our states
+   */
+  void setStates() {
+    // walking state
+    // State walking = new State("idle", "graphics/creature-walking.gif", 1, 2);
+    State walking = new State("idle", "graphics/creature.gif", 1, 1);
+
+	
+    walking.setAnimationSpeed(0.12);
+    // SoundManager.load(walking, "audio/Squish.mp3");
+    addState(walking);
+	//  sState idle = new State("idle", "graphics/creature-walking.gif", 1, 2);
+	State idle = new State("idle", "graphics/creature.gif", 1, 1);
+
     idle.setAnimationSpeed(0);
     addState(idle);
     
