@@ -262,24 +262,6 @@ class Hero extends Player {
     // running state
     addState(new State("running", "graphics/mario/small/Running-mario.gif", 1, 4));
 
-    // dead state O_O
-    State dead = new State("dead", "graphics/mario/small/Dead-mario.gif", 1, 2);
-    dead.setAnimationSpeed(0.25);
-    dead.setDuration(100);
-    addState(dead);   
-    // SoundManager.load(dead, "audio/Dead mario.mp3");
-    
-    // jumping state
-    State jumping = new State("jumping", "graphics/mario/small/Jumping-mario.gif");
-    jumping.setDuration(15);
-    addState(jumping);
-    // SoundManager.load(jumping, "audio/Jump.mp3");
-
-    // victorious state!
-    State won = new State("won", "graphics/mario/small/Standing-mario.gif");
-    won.setDuration(240);
-    addState(won);
-
     // default: just stand around doing nothing
     setCurrentState("idle");
   }
@@ -619,7 +601,7 @@ class Koopa extends Interactor {
 			float now = millis();
 			float diff = ((now/1000)-(challengeHeroStart/1000));
 			float diff_seconds = floor(diff);
-			int max_time = 30;
+			int max_time = 10;
 			if (diff_seconds < 1 ) {
 				ltxt_instruction.setText('Sing, you have\n' + max_time +' secs time');
 			}
@@ -710,14 +692,7 @@ class Koopa extends Interactor {
     addState(walking);
 	State idle = new State("idle", "graphics/enemies/Red-koopa-walking.gif", 1, 2);
     idle.setAnimationSpeed(0);
-    // SoundManager.load(idle, "audio/Squish.mp3");
     addState(idle);
-    
-    // if we get squished, we first get naked...
-    State naked = new State("naked", "graphics/enemies/Naked-koopa-walking.gif", 1, 2);
-    naked.setAnimationSpeed(0.12);
-    // SoundManager.load(naked, "audio/Squish.mp3");
-    addState(naked);
     
     setCurrentState("idle");
   }
