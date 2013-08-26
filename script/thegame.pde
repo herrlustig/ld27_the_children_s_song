@@ -73,18 +73,22 @@ class HeroLayer extends LevelLayer {
 
     showBoundaries = true;
     hero = new Hero(width/2, height/2);
-	hero.setPosition(100, 100);
+	hero.setPosition(50, 50);
     addPlayer(hero);
 	Creature creature1 = new Creature(64, height-64);
-	Creature creature2 =  new Creature(300, height-64);
-	Creature creature3 =  new Creature(780, height-64 -300);
+	Creature creature2 =  new Creature(350, height-64 -100);
+	Creature creature3 =  new Creature(780, height-64 -400);
 	Creature creature4 =  new Creature(840, height-64 -100);
-	Creature creature5 =  new Creature(200, height-64- 200);
+	Creature creature5 =  new Creature(840, 100);
 	addInteractor(creature1);
 	addInteractor(creature2);
 	addInteractor(creature3);
 	addInteractor(creature4);
 	addInteractor(creature5);
+	
+	// this many children must be found
+	creature_count = 5;
+
 	
 	// just for testing
 	/*
@@ -99,10 +103,9 @@ class HeroLayer extends LevelLayer {
 	hero.addFollower(creature5);
 	creature5.following = true;
 	
-	creature_count = 5;
 	*/
 	
-	MotherCreature mother =  new MotherCreature(600, 200);
+	MotherCreature mother =  new MotherCreature(350, 350);
 	addInteractor(mother);
 
 	
@@ -196,8 +199,8 @@ class Hero extends Player {
 	  float angle = atan2(dy, dx);
 	  float new_distanceX = dx - 1;
 	  float new_distanceY = dy - 1;
-	  float scaleSizeX = p.sx*32;
-	  float scaleSizeY = p.sy*60;
+	  float scaleSizeX = p.sx*32*0.5;
+	  float scaleSizeY = p.sy*60*0.5;
 	  if (new_distanceX < this.followDistance + scaleSizeX) { new_distanceX = this.followDistance  + scaleSizeX};
 	  if (new_distanceY < this.followDistance + scaleSizeY) { new_distanceY = this.followDistance  + scaleSizeY};
 	  float x = xin - cos(angle) * new_distanceX; 
@@ -596,7 +599,7 @@ class Creature extends Interactor {
 					challenger.beaten = true;
 					hero.changeText("Come with me!");
 					setTimeout(function() { hero.changeText("");}, 2000 );
-					this.layer.setFadeOutAlpha(255);
+					this.layer.setFadeOutAlpha(0);
 				}
 			}
 			if (diff_seconds >= max_time + 1) { 
@@ -696,6 +699,7 @@ class MotherCreature extends Interactor {
   String instrument = "tuba";
 
   Envelope rotateEnv;
+  Envelope squeezeEnv;
   
   boolean isSinging = false; 
   
@@ -850,9 +854,11 @@ class MotherCreature extends Interactor {
 		if (activChallenge == false && this.beaten != true ) { this.sing(); }
 		rotateEnv.update(0.010); // TODO: add real framerate
 		this.r = rotateEnv.current_value;
+		this.sx = this.sx_orig + (rotateEnv.current_value*30/8);
+		this.sy = this.sy_orig + (-rotateEnv.current_value*30/8);
 		// if not beaten already darken screen when you get near
 		if (this.beaten == false && game_finished != true){
-			float alpha_value = (1 - (this.distToHero/distToHeroInteraction))*255*2;
+			float alpha_value = (1 - (this.distToHero/distToHeroInteraction))*255*3;
 			if (alpha_value > 255) alpha_value = 255; // just to be sure
 			// println("Mother:, set fade out to " + alpha_value);
 			this.layer.setFadeOutAlpha(alpha_value);
@@ -925,6 +931,10 @@ class MotherCreature extends Interactor {
 		}
 	} else {
 		// println("Mother: should not be drawn");
+	}
+	
+	if (game_finished == true) {
+		ltxt_instruction.setPosition(this.layer.parent.viewbox.x+(this.layer.parent.viewbox.w/6), this.layer.parent.viewbox.y+(4*this.layer.parent.viewbox.h/6));
 	}
    }
   

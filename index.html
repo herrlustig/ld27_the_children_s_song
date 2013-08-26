@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-	<title> TODO: Game Name , Ludum Dare #27 Game Jam @Oerlikon, Switzerland</title>
+	<title> The children's songs , Ludum Dare #27 Game Jam @Oerlikon, Switzerland</title>
 	<meta name="description" content="Experimental dynamic sound library using flash" /> 
 	<meta name="keywords" content="javascript sound, javascript audio, flash synthesis, Beat Kunz, javascript to flash communication" />
 	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
@@ -15,7 +15,7 @@
 	<link type="text/css" href="style.css" rel="Stylesheet">
 </head>
 <body>
-	<h1 style="text-align: center;">TODO: Gamename</h1>
+	<h1 style="text-align: center;">The children's songs</h1>
 	<div id="content_wrapper">
 	</div>
 	
@@ -52,7 +52,7 @@
 		
 		// vars for creatures
 		creatures_volume = 0.8;
-		hero_volume = 0.9;
+		hero_volume = 1.0;
 		init_singing_note = 24;
 		init_singing_note_mother = -36;
 		init_singing_hero = -12;
@@ -94,6 +94,7 @@
 				
 				// creatures
 				dynsoundManager.load("englishhorn", "29", "audio/cor_anglais-f3.mp3");
+				dynsoundManager.load("englishhorn", "41", "audio/cor_anglais-f4.mp3");
 				dynsoundManager.load("englishhorn", "53", "audio/cor_anglais-f5.mp3");
 				dynsoundManager.load("flute", "24", "audio/flute-c3.mp3");
 				dynsoundManager.load("flute", "48", "audio/flute-c5.mp3");
@@ -153,7 +154,7 @@
 			if ( typeof(dynsoundManager.flash._play) == "function" ) {
 				$("#flash_state").html("is Active<br/> Have fun :)");
 			} else {
-				$("#flash_state").html("is DOWN<br/> YOU CAN NOT PLAY THE GAME LIKE THAT. <br/> Flash should be at least version 10 <br/> The browser recommendation is chrome");
+				$("#flash_state").html("is DOWN<br/> YOU CAN NOT PLAY THE GAME LIKE THAT. <br/> Reloading could be a solution <br/>Flash should be at least version 10 <br/> The browser recommendation is chrome");
 				$("#flash_state").css("color", "red");
 			}
 		}, 1000);
