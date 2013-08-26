@@ -443,7 +443,7 @@ class Creature extends Interactor {
 	possible_lengths.add(500); 
 	for(int i = 0; total_length <= max_song_length && notes.size() < melody_length; i++) {
 		// pick a note
-		int new_note = possible_notes.get(floor(Math.random()*(possible_notes.size()-1)));
+		int new_note = possible_notes.get(floor(Math.random()*(possible_notes.size())));
 		// pick its length
 		int new_length = possible_lengths.get(floor(Math.random()*(possible_lengths.size()-1)));
 		if ( total_length + new_length <= max_song_length) {
@@ -772,7 +772,7 @@ class MotherCreature extends Interactor {
 	possible_lengths.add(2000); 
 	for(int i = 0; total_length <= max_song_length && notes.size() < melody_length; i++) {
 		// pick a note
-		int new_note = possible_notes.get(floor(Math.random()*(possible_notes.size()-1)));
+		int new_note = possible_notes.get(floor(Math.random()*(possible_notes.size())));
 		// pick its length
 		int new_length = possible_lengths.get(floor(Math.random()*(possible_lengths.size()-1)));
 		if ( total_length + new_length <= max_song_length) {

@@ -52,7 +52,7 @@
 		
 		// vars for creatures
 		creatures_volume = 0.8;
-		hero_volume = 1.0;
+		hero_volume = 0.9;
 		init_singing_note = 24;
 		init_singing_note_mother = -36;
 		init_singing_hero = -12;
@@ -82,11 +82,11 @@
 		
 		// load some instruments
 		dynsoundManager._onFlashLoadCallback = function() {
-				dynsoundManager.load("harp", "12", "audio/harp-c2.mp3");
+				// dynsoundManager.load("harp", "12", "audio/harp-c2.mp3");
 				// dynsoundManager.load("harp", "24", "audio/harp-c3.mp3");
-				dynsoundManager.load("harp", "36", "audio/harp-c4.mp3");
+				// dynsoundManager.load("harp", "36", "audio/harp-c4.mp3");
 				// dynsoundManager.load("harp", "48", "audio/harp-c5.mp3");
-				dynsoundManager.load("harp", "60", "audio/harp-c6.mp3");
+				// dynsoundManager.load("harp", "60", "audio/harp-c6.mp3");
 				// dynsoundManager.load("harp", "72", "audio/harp-c7.mp3");
 				dynsoundManager.load("female", "48", "audio/chorus-female-c5.mp3");
 				// dynsoundManager.load("female", "60", "audio/chorus-female-c6.mp3");
