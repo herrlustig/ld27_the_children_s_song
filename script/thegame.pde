@@ -532,7 +532,7 @@ class Creature extends Interactor {
 			this.layer.setFadeOutAlpha(alpha_value);
 		}
 	} else {
-		if (this.r != 0) { // TODO: add a tolerance
+		if (this.r > 0.05 || this.r < -0.05) {
 			if (this.r > 0) {
 				this.r = this.r - (Math.PI*2/360);
 			} else {
@@ -864,7 +864,7 @@ class MotherCreature extends Interactor {
 			this.layer.setFadeOutAlpha(alpha_value);
 		}
 	} else {
-		if (this.r != 0) { // TODO: add a tolerance
+		if (this.r > 0.05 || this.r < -0.05) { // TODO: add a tolerance
 			if (this.r > 0) {
 				this.r = this.r - (Math.PI*2/640); //  Mother moves slower
 			} else {
